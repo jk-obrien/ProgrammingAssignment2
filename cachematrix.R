@@ -6,10 +6,9 @@
 
 ## Example of use:
 
-## x <- matrix(sample(16), 4, 4)
-
-## Define the object.
+## Define the object and a matrix to use it with.
 ## mcm <- makeCacheMatrix()
+## x   <- matrix(sample(16), 4, 4)
 
 ## Cache the matrix and its inverse.
 ## mcm$set_matrix(x)
@@ -21,10 +20,10 @@
 
 
 
-## The second function, cacheSolve, accepts a matrix object as an unnamed
-## argument and returns the inverse of the matrix. It will try to find a cached
-## copy of the inverse but, if none exists, it will compute it itself and will
-## cache the result.
+## The second function in this file, cacheSolve, accepts a matrix object as an
+## unnamed argument and returns the inverse of the matrix. It will try to find a
+## cached copy of the inverse but, if none exists, it will compute it itself and
+## will cache the result.
 
 ## Example of use:
 
@@ -44,7 +43,7 @@
 ## list of functions that cache the matrix, return the matrix, cache the
 ## inverse of the matrix, and return the inverse of the matrix.
 
-makeCacheMatrix <- function(x = matrix()) {
+makeCacheMatrix <- function(m = matrix()) {
 
     # Store the inverse here.
     i <- NULL
@@ -53,7 +52,7 @@ makeCacheMatrix <- function(x = matrix()) {
     set_matrix <- function(y) {
 
         # Store the matrix in the cache (parent environments).
-        x <<- y
+        m <<- y
 
         # If the matrix has changed then so has the inverse, so set it to NULL
         # in cache.
@@ -61,9 +60,10 @@ makeCacheMatrix <- function(x = matrix()) {
     }
 
     # Define the function to return the matrix.
-    get_matrix <- function() x
+    get_matrix <- function() m
 
     # Define the function to cache the inverse of the matrix.
+    # Per the specification we don't have to make sure the matrix is invertible.
     set_inverse <- function(inverse) i <<- inverse
 
     # Define the function to return the inverse of the matrix.
@@ -91,7 +91,7 @@ cacheSolve <- function(x, ...) {
     i <- x$get_inverse()
 
     # If the cached inverse is there, use it.
-    if(!is.null(i)) {
+    if( !is.null(i) ) {
         message("Found inverse in cache.")
         return(i)
     }
