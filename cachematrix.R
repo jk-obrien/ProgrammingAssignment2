@@ -31,7 +31,11 @@
 ## Use the object created above
 ## cacheSolve(mcm)
 
+## Change the matrix
+## mcm$set(matrix(sample(4),2,2))
 
+## Calculate a new inverse
+## cacheSolve(mcm)
 
 
 ## This function takes a matrix as an argument and returns a four-member named
@@ -39,16 +43,30 @@
 ## inverse of the matrix, and returns the inverse of the matrix.
 
 makeCacheMatrix <- function(x = matrix()) {
-    m <- NULL
+
+    # Store the inverse here.
+    i <- NULL
+
+    # Define the function to cache the matrix.
     set <- function(y) {
+
+        # Store the matrix in the cache (parent environments).
         x <<- y
-        i<<- NULL
+
+        # If the matrix has changed then so has the inverse.
+        i <<- NULL
     }
+
+    # Define the function to return the matrix.
     get <- function() x
+
+    # Define the function to cache the inverse of the matrix.
     setinverse <- function(inverse) i <<- inverse
+
+    # Define the function to return the inverse of the matrix.
     getinverse <- function() i
 
-
+    # Return a named list of the four functions.
     list(set = set, get = get,
          setinverse = setinverse,
          getinverse = getinverse)
@@ -62,17 +80,27 @@ makeCacheMatrix <- function(x = matrix()) {
 ## of the matrix has changed.
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+
+    # Return a matrix that is the inverse of 'x'.
     i <- x$getinverse()
 
     ## Check that the matrix hasn't changed?
 
+    # If the cached inverse is there, use it.
     if(!is.null(i)) {
         message("getting cached data")
         return(i)
     }
+
+    # Otherwise get the matrix from the cache...
     data <- x$get()
-    i <- inverse(data, ...)
+
+    #   ...and calculate the inverse of that.
+    i <- solve(data, ...)
+
+    # Cache it!
     x$setinverse(i)
+
+    # Then return it.
     i
 }
