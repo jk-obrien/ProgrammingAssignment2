@@ -92,7 +92,7 @@ cacheSolve <- function(x, ...) {
 
     # If the cached inverse is there, use it.
     if(!is.null(i)) {
-        message("getting cached data")
+        message("Found inverse in cache.")
         return(i)
     }
 
