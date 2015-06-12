@@ -1,46 +1,48 @@
 ## There are two functions in this file.
 
-## The first, makeCacheMatrix, creates a matrix object that holds a numeric
-## matrix, that can compute its inverse and that can cache both the matrix and
-## its inverse.
+## The first, makeCacheMatrix, creates an object based on a numeric matrix, that
+## can compute the inverse of the matrix and that can cache, and retreive, both
+## the matrix and its inverse.
 
 ## Example of use:
 
-## x <- matrix(sample(16),4,4)
+## x <- matrix(sample(16), 4, 4)
 
-## Define the object
+## Define the object.
 ## mcm <- makeCacheMatrix()
 
-## Cache the matrix and the inverse
-## mcm$set(x)
-## mcm$setinverse(inverse(x))
+## Cache the matrix and its inverse.
+## mcm$set_matrix(x)
+## mcm$set_inverse(solve(x))
 
-## Retrieve the matrix and the inverse
-## mcm$get()
-## mcm$getinverse()
+## Retrieve the matrix and its inverse.
+## mcm$get_matrix()
+## mcm$get_inverse()
 
 
 
 ## The second function, cacheSolve, accepts a matrix object as an unnamed
 ## argument and returns the inverse of the matrix. It will try to find a cached
-## copy of the inverse but, if none exists, or if the matrix has changed,  it
-## will compute it itself and will cache the result.
+## copy of the inverse but, if none exists, it will compute it itself and will
+## cache the result.
 
 ## Example of use:
 
-## Use the object created above
+## Use the object created above as the argument.
 ## cacheSolve(mcm)
 
-## Change the matrix
-## mcm$set(matrix(sample(4),2,2))
+## Change the matrix.
+## mcm$set_matrix( matrix(sample(4), 2, 2) )
 
-## Calculate a new inverse
+## Calculate a new inverse.
 ## cacheSolve(mcm)
 
 
+
+## makeCacheMatrix
 ## This function takes a matrix as an argument and returns a four-member named
-## list of functions that caches the matrix, returns the matrix, caches the
-## inverse of the matrix, and returns the inverse of the matrix.
+## list of functions that cache the matrix, return the matrix, cache the
+## inverse of the matrix, and return the inverse of the matrix.
 
 makeCacheMatrix <- function(x = matrix()) {
 
@@ -48,32 +50,36 @@ makeCacheMatrix <- function(x = matrix()) {
     i <- NULL
 
     # Define the function to cache the matrix.
-    set <- function(y) {
+    set_matrix <- function(y) {
 
         # Store the matrix in the cache (parent environments).
         x <<- y
 
-        # If the matrix has changed then so has the inverse.
+        # If the matrix has changed then so has the inverse, so set it to NULL
+        # in cache.
         i <<- NULL
     }
 
     # Define the function to return the matrix.
-    get <- function() x
+    get_matrix <- function() x
 
     # Define the function to cache the inverse of the matrix.
-    setinverse <- function(inverse) i <<- inverse
+    set_inverse <- function(inverse) i <<- inverse
 
     # Define the function to return the inverse of the matrix.
-    getinverse <- function() i
+    get_inverse <- function() i
 
     # Return a named list of the four functions.
-    list(set = set, get = get,
-         setinverse = setinverse,
-         getinverse = getinverse)
+    list(set_matrix  = set_matrix,
+         get_matrix  = get_matrix,
+         set_inverse = setinverse,
+         get_inverse = getinverse)
 
 }
 
 
+
+## cacheSolve
 ## This function returns the inverse of a matrix stored in an object created by
 ## the makeCacheMatrix object above. It will try to retrieve the inverse from
 ## the cache but will calculate it itself if it can't find it in the cache or
@@ -82,9 +88,7 @@ makeCacheMatrix <- function(x = matrix()) {
 cacheSolve <- function(x, ...) {
 
     # Return a matrix that is the inverse of 'x'.
-    i <- x$getinverse()
-
-    ## Check that the matrix hasn't changed?
+    i <- x$get_inverse()
 
     # If the cached inverse is there, use it.
     if(!is.null(i)) {
@@ -93,13 +97,13 @@ cacheSolve <- function(x, ...) {
     }
 
     # Otherwise get the matrix from the cache...
-    data <- x$get()
+    m <- x$get_matrix()
 
     #   ...and calculate the inverse of that.
-    i <- solve(data, ...)
+    i <- solve(m, ...)
 
     # Cache it!
-    x$setinverse(i)
+    x$set_inverse(i)
 
     # Then return it.
     i
