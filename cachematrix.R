@@ -1,12 +1,12 @@
 ## There are two functions in this file.
 
 ## The first, makeCacheMatrix, creates an object based on a numeric matrix, that
-## can compute the inverse of the matrix and that can cache, and retreive, both
-## the matrix and its inverse.
+## can cache, and retreive, both the matrix and its inverse. If the matrix
+## changes, it will automatically delete the cached inverse.
 
 ## Example of use:
 
-## Define the object and a matrix to use it with.
+## Create the object and then a matrix to use it with.
 ## mcm <- makeCacheMatrix()
 ## x   <- matrix(sample(16), 4, 4)
 
@@ -20,20 +20,20 @@
 
 
 
-## The second function in this file, cacheSolve, accepts a matrix object as an
-## unnamed argument and returns the inverse of the matrix. It will try to find a
-## cached copy of the inverse but, if none exists, it will compute it itself and
-## will cache the result.
+## The second function in this file, cacheSolve, accepts one of the objects
+## above as an unnamed argument and returns the inverse of the matrix. It will
+## try to find a cached copy of the inverse but, if none exists, it will compute
+## it itself and will cache the result.
 
 ## Example of use:
 
-## Use the object created above as the argument.
+## Use the object created above as the argument, and return the inverse.
 ## cacheSolve(mcm)
 
 ## Change the matrix.
 ## mcm$set_matrix( matrix(sample(4), 2, 2) )
 
-## Calculate a new inverse.
+## Calculate, and return, a new inverse.
 ## cacheSolve(mcm)
 
 
@@ -51,11 +51,11 @@ makeCacheMatrix <- function(m = matrix()) {
     # Define the function to cache the matrix.
     set_matrix <- function(y) {
 
-        # Store the matrix in the cache (parent environments).
+        # Store the matrix in the cache, as 'm'.
         m <<- y
 
-        # If the matrix has changed then so has the inverse, so set it to NULL
-        # in cache.
+        # If the matrix has changed then so has the inverse, 'i', so set that to
+        # NULL in cache.
         i <<- NULL
     }
 
@@ -82,21 +82,21 @@ makeCacheMatrix <- function(m = matrix()) {
 ## cacheSolve
 ## This function returns the inverse of a matrix stored in an object created by
 ## the makeCacheMatrix object above. It will try to retrieve the inverse from
-## the cache but will calculate it itself if it can't find it in the cache or
-## of the matrix has changed.
+## the cache but will calculate it itself if it can't find it.
 
 cacheSolve <- function(x, ...) {
 
-    # Return a matrix that is the inverse of 'x'.
+    # Look for a pre-calculated inverse in the cache.
     i <- x$get_inverse()
 
-    # If the cached inverse is there, use it.
+    # If the cached inverse is there, use it and we're done.
     if( !is.null(i) ) {
         message("Found inverse in cache.")
         return(i)
     }
 
     # Otherwise get the matrix from the cache...
+    message("No inverse in cache, calculating.")
     m <- x$get_matrix()
 
     #   ...and calculate the inverse of that.
